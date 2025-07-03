@@ -1,0 +1,15 @@
+# Environment
+app/.env
+app/.env.*
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Docker
+shared-data/
+*.sqlite3
+
+# VSCode / IDE
+.vscode/
+.idea/
