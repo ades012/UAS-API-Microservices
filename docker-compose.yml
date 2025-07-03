@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app-service:
+    build: ./app
+    container_name: app-service
+    ports:
+      - "3000:3000"
+      - "8001:8001"
+    volumes:
+      - ./shared-data:/data
+    depends_on:
+      - grpc-service
+
+  grpc-service:
+    build: ./grpc-service
+    container_name: grpc-service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./shared-data:/data
