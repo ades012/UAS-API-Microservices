@@ -35,13 +35,27 @@ Sistem manajemen inventaris perangkat jaringan, CCTV, dan telepon menggunakan **
 
 ```
 inventory-api/
-├── app.js
-├── db/
-│   └── database.js
-├── schema/
-│   ├── resolvers.js
-│   └── typeDefs.js
-├── .env
+├── app-service/                # Service utama (GraphQL + SOAP)
+│   ├── app.js
+│   ├── .env
+│   ├── db/
+│   │   └── database.js
+│   ├── schema/
+│   │   ├── resolvers.js
+│   │   └── typeDefs.js
+│   └── SOAP/
+│       ├── serviceLogic.js
+│       ├── wsdl/
+│       │   └── inventory.wsdl
+│       └── server.js
+├── grpc-service/              # Service gRPC
+│   ├── server.js
+│   ├── proto/
+│   │   └── inventory.proto
+│   └── db/
+│       └── database.js
+├── shared-data/               # Volume shared SQLite DB
+├── docker-compose.yml
 └── README.md
 ```
 
@@ -56,32 +70,32 @@ inventory-api/
 1. **Clone repository ini:**
 
 ```bash
-git clone https://github.com/ades012/uts-api.git
-cd UTS-API
+git clone https://github.com/ades012/UAS-API-Microservices.git
+cd UAS-API-Microservices
 ```
 
-2. **Install dependencies:**
-
-```bash
-npm install
-```
-
-3. **Buat file **.env** di root project dan isi:**
+2. **Buat file **.env** di folder app/ dan isi:**
 
 ```env
 PORT=3000
 DB_PATH=inventory.db
 ```
 
-4. **Jalankan server:**
+3. **Jalankan Docker Compose::**
 
 ```bash
-npm start
+docker-compose up --build
 ```
+
+
 
 Server akan berjalan di:
 
-> [http://localhost:3000/graphql](http://localhost:3000/graphql)
+> GraphQL: http://localhost:3000/graphql
+
+> SOAP WSDL: http://localhost:3000/wsdl
+
+> gRPC: localhost:5000
 
 ---
 
@@ -179,6 +193,30 @@ mutation {
 mutation {
   deleteItem(id: 1)
 }
+```
+
+## 🧪 Contoh Permintaan SOAP
+
+### 🔹  Mendapatkan Item Berdasarkan ID
+
+```<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://example.com/inventory">
+  <soap:Body>
+    <tns:getItemById>
+      <tns:id>1</tns:id>
+    </tns:getItemById>
+  </soap:Body>
+</soap:Envelope>
+```
+
+### 🔹  Menambahkan Item via SOAP
+
+``<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tns="http://example.com/inventory">
+  <soap:Body>
+    <tns:addItem>
+      <tns:name>Ubiquiti EdgeRouter</tns:name>
+    </tns:addItem>
+  </soap:Body>
+</soap:Envelope>
 ```
 
 ---
