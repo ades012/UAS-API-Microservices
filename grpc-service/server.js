@@ -12,6 +12,8 @@ const inventory = grpcObj.inventory;
 
 function GetItemById(call, callback) {
   const id = call.request.id;
+  console.log(`[gRPC SERVER] Permintaan getItemById(${id}) diterima`);
+
   const row = db.prepare('SELECT * FROM items WHERE id = ?').get(id);
   if (row) {
     callback(null, { id: row.id, name: row.name });

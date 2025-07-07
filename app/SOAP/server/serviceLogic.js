@@ -1,27 +1,47 @@
-const db = require('../../db/database');
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+const path = require('path');
+
+// Load proto
+const PROTO_PATH = path.join(__dirname, '../../gRPC/inventory.proto');
+const packageDef = protoLoader.loadSync(PROTO_PATH);
+const grpcObject = grpc.loadPackageDefinition(packageDef);
+const InventoryService = grpcObject.inventory.InventoryService;
+
+// Buat koneksi gRPC client
+const client = new InventoryService('grpc-service:5000', grpc.credentials.createInsecure());
 
 module.exports = {
   InventoryService: {
     InventoryPort: {
       getItemById: ({ id }) => {
-        const itemId = parseInt(id);
-        const row = db.prepare('SELECT * FROM items WHERE id = ?').get(itemId);
-        return row ? { id: row.id, name: row.name } : { id: 0, name: 'Not Found' };
+        return new Promise((resolve) => {
+          client.GetItemById({ id: parseInt(id) }, (err, response) => {
+            if (err) {
+              console.error('[SOAP?gRPC] getItemById error:', err.message);
+              return resolve({ id: 0, name: 'Not Found' });
+            }
+            console.log('[SOAP?gRPC] getItemById ?', response);
+            resolve(response);
+          });
+        });
       },
+
       getAllItems: () => {
-        const rows = db.prepare('SELECT id, name FROM items').all();
-        return { items: rows };
-        },
+        // Belum ada method gRPC-nya, bisa di-extend nanti
+        return Promise.resolve({ items: [] });
+      },
+
       addItem: ({ name }) => {
-        const stmt = db.prepare('INSERT INTO items (name) VALUES (?)');
-        const result = stmt.run(name);
-        return { id: result.lastInsertRowid, name };
-        },
+        // Belum ada method gRPC-nya, dummy response
+        return Promise.resolve({ id: 999, name });
+      },
+
       deleteItem: ({ id }) => {
-        const itemId = parseInt(id);
-        const result = db.prepare('DELETE FROM items WHERE id = ?').run(itemId);
-        return { success: result.changes > 0 };
-        }
+        // Belum ada method gRPC-nya, dummy response
+        return Promise.resolve({ success: true });
+      }
     }
   }
 };
+

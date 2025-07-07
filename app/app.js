@@ -1,6 +1,6 @@
 require('dotenv').config();
 require('./SOAP/server/soapService');
-require('./gRPC/server');
+// require('./gRPC/server');
 const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
